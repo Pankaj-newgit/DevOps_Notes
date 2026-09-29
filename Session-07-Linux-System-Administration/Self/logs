@@ -1,0 +1,49 @@
+root@radhe2:/tmp/Pankaj# history
+    1  apt-get update && apt install ngnix -y
+    2  ls
+    3  ls -lrt
+    4  apt-get update && apt install nginx -y
+    5  cd /tmp/
+    6  ls
+    7  uname -a
+    8  ps -ef | grep nginx
+    9  mkdir Pankaj
+   10  ls
+   11  cd Pankaj/
+   12  ls
+   13  touch allgood
+   14  ls
+   15  vi allgood 
+   16  ls
+   17  cat allgood allgood 
+   18  chmod +x allgood 
+   19  ls
+   20  ./allgood 
+   21  cd all
+   22  cp allgood  fine
+   23  ls
+   24  cat fine 
+   25  ./fine
+   26  mv fine awesome
+   27  ls 
+   28  ./awesome 
+   29  uname -a
+   30  top
+   31  uptime
+   32  free
+   33  last
+   34  df 
+   35  df -kh
+   36  du 
+   37  du -sh*
+   38  du -sh *
+   39  ping 
+   40  who
+   41  locate*.txt
+   42  history
+root@radhe2:/tmp/Pankaj# 
+
+
+
+=====================================
+
