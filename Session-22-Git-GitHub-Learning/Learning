@@ -23,3 +23,28 @@ Collaboration: Multiple developers can work in parallel from different locations
 Centralized management: Code pushed to a central repo is safe even if a developer's laptop fails or they go on leave.
 Comparison: Diff between versions (who added/deleted what) is visible per commit.
 Revert: A single git revert command restores a previous version (e.g., client rejects v2 and wants v1 back).
+
+
+Q:-What is a Commit?
+""""""""""""""""""""
+A commit is the act of finalizing and saving code changes as a tracked snapshot.
+Each commit receives a unique hexadecimal commit ID (tracking number) that records what changed, who changed it, and when.
+Demonstrated on the VLC open-source GitHub repo: green + lines = additions; red - lines = deletions, all tracked per commit ID.
+Q:-Staging Area
+"""""""""""""""
+The staging area is a waiting zone between the working directory and the remote GitHub repo — a buffer before pushing.
+Analogy used: like an airplane on the runway preparing for takeoff — positioned and ready before launch.
+Files must be explicitly added to the staging area with git add before they can be committed; Git won't track files it hasn't been told about.
+The staging area allows developers to reset wrong files or code before the final push.
+Cannot be bypassed — it is a mandatory part of Git's architecture.
+Q:-Clone vs. Fork
+"""""""""""""""""
+Clone: Downloads a full, fresh copy of a repository from GitHub to a local machine. Does not require a GitHub account.
+Fork: Copies a repository cloud-to-cloud (GitHub account to GitHub account); requires a GitHub account. The forked copy appears under the user's own profile.
+If the parent (upstream) repo changes, the forked child repo receives a notification/option to merge those changes — it does not sync automatically without user action.
+Demonstrated live: a student (Mithun) forked the instructor's "Multicloud + DevOps with AI Challenge" repo, which already had 295 forks.
+Q:-README and Markdown Files
+""""""""""""""""""""""""""""
+The README.md is the first file in a repository; it describes the project — how to run it, what it does, licensing, platform info, contribution guidelines.
+Markdown (.md) files render formatted text (colors, headings, lists) in the GitHub UI; the raw file contains plain markdown syntax.
+VLC's GitHub repo was used as a live example: README contains open-source license info, platform info, and contribution guidelines.
