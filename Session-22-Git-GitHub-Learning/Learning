@@ -11,3 +11,15 @@ If they ask a follow-up, you can add:
 Why use it? It helps you track history, roll back to an earlier version if something breaks, and collaborate without overwriting each other’s work.
 Key commands: git init, git clone, git add, git commit, git push, git pull, git branch, git merge.
 Git vs GitHub: Git is the tool that manages versions on your computer. GitHub is an online service that hosts Git repositories
+
+
+Q:-Version Control
+""""""""""""""""""
+Version control maintains different snapshots of files/code over time, enabling tracking, rollback, and collaboration.
+Demonstrated with a Google Sheets example: each edit is timestamped, and any prior version can be restored with one click.
+Key benefits explained:
+Tracking: Know who changed what and when.
+Collaboration: Multiple developers can work in parallel from different locations.
+Centralized management: Code pushed to a central repo is safe even if a developer's laptop fails or they go on leave.
+Comparison: Diff between versions (who added/deleted what) is visible per commit.
+Revert: A single git revert command restores a previous version (e.g., client rejects v2 and wants v1 back).
