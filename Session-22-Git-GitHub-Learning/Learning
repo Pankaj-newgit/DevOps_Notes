@@ -1,0 +1,13 @@
+Today Git and Github learning.topics,
+=======================================
+Q:- What is git.
+""""""""""""""""
+"Git is a version control system that tracks code changes and helps teams collaborate by managing different versions of a project.”
+
+“Git is a distributed version control system that tracks changes in source code over time. It lets multiple developers work on the same project simultaneously, maintain a complete history of every change, create branches to develop features independently, and merge them back safely. Because it’s distributed, every developer has a full copy of the repository on their own machine, so they can work offline and the project isn’t dependent on a single central server. Platforms like GitHub, GitLab, and Bitbucket are used to host Git repositories and collaborate with teams.”
+
+If they ask a follow-up, you can add:
+
+Why use it? It helps you track history, roll back to an earlier version if something breaks, and collaborate without overwriting each other’s work.
+Key commands: git init, git clone, git add, git commit, git push, git pull, git branch, git merge.
+Git vs GitHub: Git is the tool that manages versions on your computer. GitHub is an online service that hosts Git repositories
