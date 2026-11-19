@@ -1,0 +1,500 @@
+# **Kubernetes Troubleshooting – 21 Interview Questions & Answers**
+
+These answers are designed for a **5–6 years experienced Cloud & DevOps Engineer**. I've written them in a professional, practical, production-oriented way so you can speak them directly in an interview.
+
+The answers follow a real production troubleshooting approach rather than just theoretical definitions.
+
+## **1. If a Pod is down, how do you debug it?**
+
+**Interview Answer:**
+
+"First, I check the current status of the Pod using `kubectl get pods`. If the Pod is not running, I use `kubectl describe pod` to check its events, scheduling status, container state and any failure reasons.
+
+Then I check the container logs using `kubectl logs` to identify application-level issues. If the container has restarted, I use `kubectl logs --previous` to check the logs of the previous container instance.
+
+Based on the findings, I investigate issues related to image pulling, resource limits, application configuration, probes or node health."
+
+**Commands:**
+
+```
+kubectl get pods -n <namespace>
+
+kubectl describe pod <pod-name> -n <namespace>
+
+kubectl logs <pod-name> -n <namespace>
+
+kubectl logs <pod-name> --previous -n <namespace>
+
+kubectl get events -n <namespace> --sort-by=.metadata.creationTimestamp
+```
+
+## **2. What happens when a container crashes in Kubernetes?**
+
+**Interview Answer:**
+
+"When a container crashes, Kubernetes detects the failure through the container runtime and the kubelet.
+
+If the Pod's restart policy allows it, Kubernetes attempts to restart the container. If the container repeatedly crashes, it may enter a CrashLoopBackOff state.
+
+I investigate the container logs, exit code, resource consumption, application configuration and health probes to identify the root cause."
+
+## **3. What is CrashLoopBackOff?**
+
+**Interview Answer:**
+
+"CrashLoopBackOff is a Kubernetes state in which a container repeatedly starts, crashes and gets restarted.
+
+Kubernetes applies an exponential backoff delay between restart attempts to avoid continuously restarting the container.
+
+Common reasons include application startup failures, incorrect environment variables, missing configurations, insufficient resources or failing startup and liveness probes."
+
+## **4. What are the common reasons for CrashLoopBackOff?**
+
+**Interview Answer:**
+
+"The most common reasons are:
+
+1. Application startup failure or application bugs.
+2. Incorrect environment variables or configuration.
+3. Missing ConfigMaps or Secrets.
+4. Insufficient memory or CPU resources.
+5. Incorrect liveness or startup probe configuration.
+6. Missing dependencies or database connectivity issues.
+7. Incorrect container entrypoint or startup command.
+
+I usually check the previous container logs, Pod description, exit code and events to identify the actual root cause."
+
+## **5. How do you troubleshoot CrashLoopBackOff?**
+
+**Interview Answer:**
+
+"First, I identify the affected Pod using `kubectl get pods`. Then I check its description and previous container logs to understand why the container is restarting.
+
+I specifically look for the exit code, OOMKilled status, application exceptions and probe failures.
+
+After identifying the issue, I fix the application configuration, resource allocation or health probe settings, depending on the root cause.
+
+Finally, I verify that the Pod becomes Running and Ready."
+
+**Commands:**
+
+```
+kubectl get pods
+
+kubectl describe pod <pod-name>
+
+kubectl logs <pod-name> --previous
+
+kubectl get pod <pod-name> -o yaml
+
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+
+## **6. A Pod is in Pending state. How do you troubleshoot it?**
+
+**Interview Answer:**
+
+"When a Pod is in Pending state, it generally means Kubernetes has not successfully scheduled it onto a node, although Pending can also include other pre-running stages.
+
+I first check the Pod description to identify scheduling events and warnings.
+
+I investigate whether the cluster has sufficient CPU and memory, whether node selectors or affinity rules are matching, whether taints and tolerations are configured correctly, and whether PVCs are bound.
+
+Once I identify the scheduling issue, I address the resource constraints or scheduling configuration and verify that the Pod gets scheduled successfully."
+
+## **7. What are the common reasons for a Pod to remain in Pending state?**
+
+**Interview Answer:**
+
+"The common reasons are:
+
+1. Insufficient CPU or memory on available nodes.
+2. Persistent Volume Claims are not bound.
+3. Node selector or node affinity mismatch.
+4. Node taints without matching tolerations.
+5. Resource requests are higher than available node capacity.
+6. Cluster autoscaler is unable to provision additional nodes.
+7. Scheduling constraints or topology requirements cannot be satisfied."
+
+## **8. Which command do you use first to troubleshoot a Pending Pod?**
+
+**Interview Answer:**
+
+"My first command is `kubectl describe pod <pod-name>` because it provides detailed information about the Pod, especially the Events section.
+
+For example, if I see `FailedScheduling` with `Insufficient CPU`, it indicates that the available nodes do not have enough CPU capacity to schedule the Pod.
+
+Based on the event message, I investigate the node resources, scheduling rules and cluster capacity."
+
+```
+kubectl describe pod <pod-name> -n <namespace>
+```
+
+## **9. What does&#x20;**`kubectl describe pod`**&#x20;show?**
+
+**Interview Answer:**
+
+"`kubectl describe pod` provides detailed information about a Pod, including its current status, node assignment, container details, image, resource requests and limits, environment configuration, volume mounts, health probes and recent events.
+
+I mainly use it during troubleshooting because the Events section helps identify issues such as FailedScheduling, ImagePullBackOff, failed probes and volume mounting failures."
+
+## **10. If 6 Pods are running and 4 Pods are not running, how would you troubleshoot?**
+
+**Interview Answer:**
+
+"First, I check the Deployment and ReplicaSet status to understand why the desired number of replicas is not available.
+
+Then I identify the four unhealthy Pods and check their individual statuses using `kubectl describe pod` and `kubectl logs`.
+
+I investigate whether the issue is related to resource availability, image pulling, application crashes, health probes or node scheduling.
+
+I also check node capacity and recent deployment events.
+
+After identifying the root cause, I fix it and monitor the Deployment until all six replicas become available."
+
+**Commands:**
+
+```
+kubectl get deployment
+
+kubectl get rs
+
+kubectl get pods -o wide
+
+kubectl describe deployment <deployment-name>
+
+kubectl describe pod <pod-name>
+
+kubectl rollout status deployment <deployment-name>
+```
+
+## **11. If only 20 out of 40 Pods are ready after deployment, how would you investigate?**
+
+**Interview Answer:**
+
+"If only 20 out of 40 Pods are Ready after deployment, I first check the Deployment rollout status and identify the remaining 20 Pods that are not Ready.
+
+I check whether the issue is related to application startup, readiness probe failures, insufficient resources, image pulling or node capacity.
+
+I also check the ReplicaSet, deployment events and application logs.
+
+If the issue started immediately after a new deployment, I compare the new ReplicaSet with the previous version. If the new release is causing production impact, I consider rolling back to the previous stable version.
+
+Once the issue is resolved, I verify that all 40 replicas are Ready."
+
+**Commands:**
+
+```
+kubectl rollout status deployment <deployment-name>
+
+kubectl get deployment
+
+kubectl get rs
+
+kubectl get pods -o wide
+
+kubectl describe pod <pod-name>
+
+kubectl rollout history deployment <deployment-name>
+
+kubectl rollout undo deployment <deployment-name>
+```
+
+## **12. If a node becomes NotReady, what do you check?**
+
+**Interview Answer:**
+
+"If a Kubernetes node becomes NotReady, I first check the node status using `kubectl get nodes` and then use `kubectl describe node` to identify the reason.
+
+I check the node conditions, especially MemoryPressure, DiskPressure, PIDPressure and Ready status.
+
+Then I investigate kubelet health, container runtime status, network connectivity, disk availability and resource utilization on the affected node.
+
+If required, I coordinate with the infrastructure team to investigate the underlying VM or network issue.
+
+After fixing the issue, I verify that the node returns to Ready state and workloads are scheduled properly."
+
+**Commands:**
+
+```
+kubectl get nodes
+
+kubectl describe node <node-name>
+
+kubectl get events --all-namespaces
+
+systemctl status kubelet
+
+systemctl status containerd
+
+df -h
+
+free -m
+
+top
+```
+
+## **13. You have three nodes and one node is not receiving traffic. How would you identify, troubleshoot and fix the issue?**
+
+**Interview Answer:**
+
+"First, I verify whether the affected node is in Ready state.
+
+Then I check whether the Pods running on that node are healthy and Ready.
+
+I investigate the Kubernetes Service endpoints to verify whether the affected Pods are registered as backend endpoints.
+
+I also check Service selectors, kube-proxy, CNI networking, node-level firewall rules and load balancer health checks.
+
+If the node is healthy but traffic is not reaching it, I investigate the networking or load-balancing configuration.
+
+If the node is unhealthy, I may cordon and drain it to safely move workloads to healthy nodes, depending on the production impact and available capacity."
+
+**Commands:**
+
+```
+kubectl get nodes -o wide
+
+kubectl get pods -o wide -A
+
+kubectl get svc -A
+
+kubectl get endpoints <service-name>
+
+kubectl describe node <node-name>
+
+kubectl get endpointslices -A
+```
+
+## **14. An application is accessible inside the cluster but not from outside. How would you troubleshoot it?**
+
+**Interview Answer:**
+
+"If an application is accessible internally but not externally, I first verify that the application and Kubernetes Service are working correctly inside the cluster.
+
+Then I check the Service type, Ingress configuration and external load balancer.
+
+I verify the Ingress rules, hostname, TLS configuration, Service port and targetPort.
+
+I also investigate external network connectivity, firewall rules, security groups, routing and DNS resolution.
+
+Finally, I test connectivity at each layer to identify where the traffic is getting blocked."
+
+**Commands:**
+
+```
+kubectl get pods -o wide
+
+kubectl get svc
+
+kubectl get ingress
+
+kubectl describe ingress <ingress-name>
+
+kubectl get endpoints <service-name>
+
+kubectl get pods -n <ingress-namespace>
+```
+
+## **15. Your application is deployed and exposed, but traffic is not reaching backend Pods. How would you troubleshoot?**
+
+**Interview Answer:**
+
+"First, I verify that the backend Pods are Running and Ready.
+
+Then I check the Kubernetes Service configuration, especially its selector, port and targetPort, to ensure that it correctly matches the backend Pods.
+
+I check the Service endpoints to confirm whether the backend Pods are registered.
+
+If the endpoints are empty, I investigate label mismatches or readiness probe failures.
+
+If endpoints are available, I test connectivity from another Pod using the Service DNS name and port.
+
+I also check NetworkPolicies, application listening ports and backend application logs to identify where the traffic is failing."
+
+**Commands:**
+
+```
+kubectl get pods --show-labels
+
+kubectl get svc
+
+kubectl describe svc <service-name>
+
+kubectl get endpoints <service-name>
+
+kubectl get networkpolicy -A
+
+kubectl logs <backend-pod>
+```
+
+## **16. A Service becomes inaccessible after an Ingress update. Which components would you verify?**
+
+**Interview Answer:**
+
+"After an Ingress update, I first verify the Ingress resource and check whether the new routing rules are correctly configured.
+
+Then I check the Ingress Controller status and logs.
+
+I verify the hostname, path rules, backend Service name, Service port and TLS configuration.
+
+I also check whether the backend Service has healthy endpoints and whether the Ingress Controller can communicate with those endpoints.
+
+If the issue started after the configuration change, I compare it with the previous working configuration and roll back the change if required."
+
+**Commands:**
+
+```
+kubectl get ingress
+
+kubectl describe ingress <ingress-name>
+
+kubectl get pods -n <ingress-namespace>
+
+kubectl logs <ingress-controller-pod> -n <ingress-namespace>
+
+kubectl get svc
+
+kubectl get endpoints <service-name>
+```
+
+## **17. How would you troubleshoot an application returning 502 or 503 errors?**
+
+**Interview Answer:**
+
+"First, I identify whether the 502 or 503 error is coming from the Ingress Controller, load balancer or backend application.
+
+A 502 generally indicates that the proxy or gateway received an invalid response from the upstream server.
+
+A 503 generally indicates that the service is temporarily unavailable or has no healthy backend available.
+
+I check the backend Pod health, Service endpoints, application logs, readiness probes and Ingress Controller logs.
+
+I also verify the Service port, targetPort and application listening port.
+
+After identifying the issue, I fix the backend connectivity or application problem and validate the response through the external endpoint."
+
+## **18. How would you troubleshoot intermittent 503 errors in Kubernetes?**
+
+**Interview Answer:**
+
+"For intermittent 503 errors, I first correlate the error timestamps with Pod restarts, deployment activities and infrastructure alerts.
+
+I check whether the backend Pods are frequently becoming NotReady or restarting.
+
+Then I investigate readiness probe failures, CPU and memory utilization, resource throttling, node pressure and application response times.
+
+I also verify whether the Service endpoints are changing frequently or whether the load balancer is removing unhealthy backends.
+
+I correlate Kubernetes events, application logs and monitoring metrics to identify the root cause."
+
+## **19. How would you verify whether the issue is with the Pod, Service, Ingress or Load Balancer?**
+
+**Interview Answer:**
+
+"I follow a layer-by-layer troubleshooting approach, starting from the backend and moving towards the external entry point.
+
+1. **Pod:** Check whether the Pod is Running and Ready and whether the application is responding on its port.
+2. **Service:** Verify the Service selector, ports and endpoints.
+3. **Ingress:** Check the routing rules, hostname, path and backend Service configuration.
+4. **Load Balancer:** Verify listener configuration, target health, security groups and network connectivity.
+
+I test connectivity at every layer to isolate the exact component causing the issue rather than making changes across multiple components."
+
+[Inside the Cluster: Ingress in Focus — How External Traffic Reaches Your Services | by KELVI MANAVADARIA | Medium](https://images.openai.com/static-rsc-4/N3WoFxY-KKSDv4MP14jeEhC0jAwuoR8uIT3TU2c4maNw6d0dCJlkUwNEgEbInSSWJ_k1_Q_3kU4K64OgDCmvjSHQJeIBoGUns-1eG3WjA8YMIppVdb8bdmD-tdpThY0PQqXuExpvk6ReZxi3KlWsB1AsIuE9-dcsn97CPv70A6Q?purpose=inline)
+
+[medium.com](https://medium.com/%40kelvi030117/inside-the-cluster-ingress-in-focus-how-external-traffic-reaches-your-services-95006bd8cdb4?utm_source=chatgpt.com)
+
+## **20. What logs and metrics do you check during Kubernetes troubleshooting?**
+
+**Interview Answer:**
+
+"During Kubernetes troubleshooting, I check three major areas: application logs, Kubernetes events and infrastructure metrics.
+
+For logs, I use `kubectl logs` to investigate application errors and container failures.
+
+For events, I use `kubectl describe` and `kubectl get events` to identify scheduling issues, probe failures and image-pulling problems.
+
+For metrics, I monitor CPU, memory, disk utilization, Pod restarts, node health and application response times.
+
+In production environments, I use monitoring tools such as Prometheus, Grafana, CloudWatch and Dynatrace to correlate metrics and logs and identify the root cause."
+
+**Commands:**
+
+```
+kubectl logs <pod-name>
+
+kubectl describe pod <pod-name>
+
+kubectl get events -A
+
+kubectl top pods -A
+
+kubectl top nodes
+
+kubectl get pods -o wide
+```
+
+## **21. Why should Pod-related issues be investigated in Kubernetes rather than Jenkins?**
+
+**Interview Answer:**
+
+"Jenkins is primarily responsible for CI/CD automation, such as building application artifacts, running tests and triggering deployments.
+
+Once the application is successfully deployed to Kubernetes, the actual runtime environment is managed by Kubernetes.
+
+Therefore, if a Pod crashes, becomes Pending, enters CrashLoopBackOff or fails its health checks, I investigate the issue directly in Kubernetes using kubectl commands, application logs, events and monitoring tools.
+
+However, if the issue is related to the build, pipeline execution, deployment configuration or image creation, I investigate the Jenkins pipeline.
+
+In short, Jenkins handles the deployment process, while Kubernetes manages the application workloads at runtime."
+
+# **Important: Commands you should remember for the interview**
+
+These are the commands I recommend practising until you can explain them without looking at notes.
+
+| Command                    | Purpose                             |
+| -------------------------- | ----------------------------------- |
+| `kubectl get pods -o wide` | Check Pod status and node placement |
+| `kubectl describe pod`     | Investigate Pod details and events  |
+| `kubectl logs`             | Check application logs              |
+| `kubectl logs --previous`  | Check previous container logs       |
+| `kubectl get nodes`        | Check node health                   |
+| `kubectl describe node`    | Investigate node issues             |
+| `kubectl get svc`          | Check Services                      |
+| `kubectl get endpoints`    | Check backend endpoints             |
+| `kubectl get ingress`      | Check Ingress resources             |
+| `kubectl get events -A`    | Check cluster events                |
+| `kubectl top pods`         | Check Pod resource utilization      |
+| `kubectl top nodes`        | Check node resource utilization     |
+| `kubectl rollout status`   | Check deployment progress           |
+| `kubectl rollout undo`     | Roll back a deployment              |
+
+# **My interview recommendation**
+
+At 5–6 years of experience, the interviewer is not just checking whether you know Kubernetes commands. They want to understand your production troubleshooting approach.
+
+Remember this sequence:
+
+**Your Kubernetes troubleshooting methodology**
+
+1. **Identify the issue**
+
+   `kubectl get pods`, `kubectl get nodes`
+2. **Investigate the root cause**
+
+   `kubectl describe`, `kubectl get events`
+3. **Check application logs**
+
+   `kubectl logs`, `kubectl logs --previous`
+4. **Check networking and resources**
+
+   Services, endpoints, Ingress, CPU and memory
+5. **Implement the fix**
+
+   Correct configuration, resources, networking or application issues.
+6. **Validate and monitor**
+
+   Confirm Pods are Ready, traffic is working and errors have stopped.
+
+**One important interview tip:** Don't just say, "I will restart the Pod." Explain how you identify the root cause first, apply the fix, and verify that the issue does not happen again. That demonstrates production-level troubleshooting experience.
